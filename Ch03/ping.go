@@ -1,3 +1,5 @@
+// Page 64 - 65
+// Listing 3-10: A function that pings a network connection at a regular interval.
 package ch03
 
 import (
