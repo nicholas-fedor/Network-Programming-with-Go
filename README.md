@@ -5,10 +5,10 @@ Code from the book.
 
 1. An overview of networked systems
 2. Resource location and traffic routing
-3. Reliable TCP data streams
-4. Sending TCP data
-5. Unreliable UDP communication
-6. Ensuring UDP reliability
+3. [Reliable TCP data streams](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch03)
+4. [Sending TCP data](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch04)
+5. [Unreliable UDP communication](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch05)
+6. [Ensuring UDP reliability](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch06)
 7. Unix domain sockets
 8. Writing HTTP clients
 9. Building HTTP services
