@@ -6,15 +6,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io"
 	"strings"
 )
 
 const (
 	// TFTP limits datagram packets to 516 bytes or fewer to avoid
 	// fragmentation.
-	// We define two constants to enforce the datagram size limit and the
-	// maximum data block size.
-	// The maximum block size is the datagram size minus a 4-byte header.
+	// We define two consta size.
+	// The maximum block si ze is the datagram size minus a 4-byte header.
 	DatagramSize = 516              // the maximum supported datagram size
 	BlockSize    = DatagramSize - 4 // the DatagramSize minus a 4-byte header
 )
@@ -158,6 +158,68 @@ func (q *ReadReq) UnmarshalBinary(p []byte) error {
 	if actual != "octet" {
 		return errors.New("only binary transfers supported")
 	}
+
+	return nil
+}
+
+// Page 126
+// Listing 6-4: Date type and its binary marshaling method.
+// Data struct keeps track of the current block number and the data source.
+type Data struct {
+	Block   uint16
+	Payload io.Reader
+}
+
+// MarshalBinary will return 516 bytes per call at most by relying on the
+// io.CopyN function and the BlockSize constant.
+func (d *Data) MarshalBinary() ([]byte, error) {
+	b := new(bytes.Buffer)
+	b.Grow(DatagramSize)
+
+	d.Block++ // block numbers increment from 1
+
+	err := binary.Write(b, binary.BigEndian, OpData) // write operation code
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Write(b, binary.BigEndian, d.Block) // write block number
+	if err != nil {
+		return nil, err
+	}
+
+	// write up to BlockSize worth of bytes
+	_, err = io.CopyN(b, d.Payload, BlockSize)
+	if err != nil || err != io.EOF {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+// Page 127
+// Listing 6-5: Data type implementation.
+func (d *Data) UnmarshalBinary(p []byte) error {
+	if l := len(p); l < 4 || l > DatagramSize {
+		return errors.New("invalid DATA")
+	}
+
+	var opcode OpCode
+
+	// Reads and checks the operation code.
+	err := binary.Read(bytes.NewReader(p[:2]), binary.BigEndian, &opcode)
+	if err != nil || opcode != OpData {
+		return errors.New("invalid DATA")
+	}
+
+	// Read and checks the block number.
+	err = binary.Read(bytes.NewReader(p[2:4]), binary.BigEndian, &d.Block)
+	if err != nil {
+		return errors.New("invalid DATA")
+	}
+
+	// Moves the remaining bytes into a new buffer and assigns it to the Payload field
+	d.Payload = bytes.NewBuffer(p[4:])
 
 	return nil
 }
