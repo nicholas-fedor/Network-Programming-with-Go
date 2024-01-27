@@ -13,7 +13,7 @@ import (
 const (
 	// TFTP limits datagram packets to 516 bytes or fewer to avoid
 	// fragmentation.
-	// We define two consta size.
+	// We define two constant size.
 	// The maximum block si ze is the datagram size minus a 4-byte header.
 	DatagramSize = 516              // the maximum supported datagram size
 	BlockSize    = DatagramSize - 4 // the DatagramSize minus a 4-byte header
