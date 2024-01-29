@@ -223,3 +223,107 @@ func (d *Data) UnmarshalBinary(p []byte) error {
 
 	return nil
 }
+
+// Pages 128 - 129
+// Listing 6-6: Acknowledgement type implementation.
+type Ack uint16 // Acknowledgement packet represented by a 16-bit, unsigned integer.
+
+func (a Ack) MarshalBinary() ([]byte, error) {
+	cap := 2 + 2 // operation code + block number
+
+	b := new(bytes.Buffer)
+	b.Grow(cap)
+
+	err := binary.Write(b, binary.BigEndian, OpAck) // write operation code
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Write(b, binary.BigEndian, a) // write block number
+	if err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+func (a *Ack) UnmarshalBinary(p []byte) error {
+	var code OpCode
+
+	r := bytes.NewReader(p)
+
+	err := binary.Read(r, binary.BigEndian, &code) // read operation code
+	if err != nil {
+		return err
+	}
+
+	if code != OpAck {
+		return errors.New("invalid ACK")
+	}
+
+	return binary.Read(r, binary.BigEndian, a) // read block number
+}
+
+// Page 129 - 130
+// Listing 6-7: Error type used for conveying errors between the client and server.
+type Err struct {
+	Error   ErrCode
+	Message string
+}
+
+func (e Err) MarshalBinary() ([]byte, error) {
+	// operation code + error code + message + 0 byte
+	cap := 2 + 2 + len(e.Message) + 1
+
+	b := new(bytes.Buffer)
+	b.Grow(cap)
+
+	err := binary.Write(b, binary.BigEndian, OpErr) // write operation code
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Write(b, binary.BigEndian, e.Error) // write error code
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = b.WriteString(e.Message) // write message
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.WriteByte(0) // write 0 byte
+	if err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+// Page 130
+// Listing 6-8: Error type's binary unmarshaler implementation.
+func (e *Err) UnmarshalBinary(p []byte) error {
+	r := bytes.NewBuffer(p)
+
+	var code OpCode
+
+	err := binary.Read(r, binary.BigEndian, &code) // read operation code
+	if err != nil {
+		return err
+	}
+
+	if code != OpErr {
+		return errors.New("invalid ERROR")
+	}
+
+	err = binary.Read(r, binary.BigEndian, &e.Error) // read error message
+	if err != nil {
+		return err
+	}
+
+	e.Message, err = r.ReadString(0)
+	e.Message = strings.TrimRight(e.Message, "\x00") // remove the 0-byte
+
+	return err
+}
