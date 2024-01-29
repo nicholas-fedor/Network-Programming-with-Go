@@ -1,6 +1,9 @@
 # Network Programming with Go
 Code from the book.
 
+## Author's Reference Code
+<https://github.com/awoodbeck/gnp>
+
 ## Chapters
 
 1. An overview of networked systems

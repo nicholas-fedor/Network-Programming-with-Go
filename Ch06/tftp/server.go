@@ -23,7 +23,7 @@ func (s Server) ListenAndServe(addr string) error {
 	}
 	defer func() { _ = conn.Close() }()
 
-	log.Printf("Listening on %s ... \n", conn.LocalAddr())
+	log.Printf("Listening on %s ...\n", conn.LocalAddr())
 
 	return s.Serve(conn)
 }
@@ -57,14 +57,10 @@ func (s *Server) Serve(conn net.PacketConn) error {
 
 		err = rrq.UnmarshalBinary(buf)
 		if err != nil {
-			return err
-		}
-
-		err = rrq.UnmarshalBinary(buf)
-		if err != nil {
 			log.Printf("[%s] bad request: %v", addr, err)
 			continue
 		}
+
 		go s.handle(addr.String(), rrq)
 	}
 }
@@ -110,7 +106,7 @@ NEXTPACKET:
 			_, err = conn.Read(buf)
 			if err != nil {
 				if nErr, ok := err.(net.Error); ok && nErr.Timeout() {
-					continue RETRY // Loop back to RETRY label
+					continue RETRY
 				}
 
 				log.Printf("[%s] waiting for ACK: %v", clientAddr, err)
@@ -121,15 +117,17 @@ NEXTPACKET:
 			case ackPkt.UnmarshalBinary(buf) == nil:
 				if uint16(ackPkt) == dataPkt.Block {
 					// received ACK; send next data packet
-					continue NEXTPACKET // Loop back to NEXTPACKET label
+					continue NEXTPACKET
 				}
 			case errPkt.UnmarshalBinary(buf) == nil:
-				log.Printf("[%s] received error: %v", clientAddr, errPkt.Message)
+				log.Printf("[%s] received error: %v",
+					clientAddr, errPkt.Message)
 				return
 			default:
 				log.Printf("[%s] bad packet", clientAddr)
 			}
 		}
+
 		log.Printf("[%s] exhausted retries", clientAddr)
 		return
 	}
