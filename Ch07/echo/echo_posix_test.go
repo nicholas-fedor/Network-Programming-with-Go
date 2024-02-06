@@ -1,3 +1,6 @@
+//go:build darwin || linux
+// +build darwin linux
+
 // Page 149
 // Listing 7-6: Building constraints and imports for macOS and Linux
 package echo
