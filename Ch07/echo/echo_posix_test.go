@@ -3,6 +3,7 @@
 package echo
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -43,7 +44,10 @@ func TestEchoServerUnixDatagram(t *testing.T) {
 
 	// Page 150
 	// Listing 7-8: Instantiating the datagram-based echo client.
-	//
+	// Just as with UDP connections, both the server and the client must bind to
+	// an address so they can send and receive datagrams.
+	// The server has its own socket file that is separate from the client's
+	// socket file in Listing 7-8.
 	cSocket := filepath.Join(dir, fmt.Sprintf("c%d.sock", os.Getpid()))
 	client, err := net.ListenPacket("unixgram", cSocket)
 	if err != nil {
@@ -62,5 +66,35 @@ func TestEchoServerUnixDatagram(t *testing.T) {
 	err = os.Chmod(cSocket, os.ModeSocket|0622)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Page 151
+	// Listing 7-9: Using unixgram sockets to echo messages.
+	msg := []byte("ping")
+	for i := 0; i < 3; i++ { // Write 3 "ping" messages
+		// We write three ping messages to the server before reading the first datagram.
+		_, err = client.WriteTo(msg, serverAddr)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	buf := make([]byte, 1024)
+	for i := 0; i < 3; i++ { // read 3 "ping" messages
+		// We then perform three reads with a buffer large enough to hold all
+		// three ping messages. As expected, unixgram sockets maintain the
+		// delineation between messages; we send three messages and read three replies.
+		n, addr, err := client.ReadFrom(buf)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if addr.String() != serverAddr.String() {
+			t.Fatalf("received reply from %q instead of %q", addr, serverAddr)
+		}
+
+		if !bytes.Equal(msg, buf[:n]) {
+			t.Fatalf("expected reply %q; actual reply %q", msg, buf[:n])
+		}
 	}
 }
