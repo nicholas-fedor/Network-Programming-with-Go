@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/nicholas-fedor/Network-Programming-with-Go/Ch09/handlers"
 )
 
 func TestSimpleHTTPServer(t *testing.T) {
@@ -65,10 +67,62 @@ func TestSimpleHTTPServer(t *testing.T) {
 		// input.
 		// This test case results in the string Hello, &lt;world&gt;! in the
 		// response body.
-		{http.MethodPost, bytes.NewBuffer("<world>"), http.StatusOK, "Hello, &lt;world&gt;!"},
-		//
+		{http.MethodPost, bytes.NewBufferString("<world>"), http.StatusOK, "Hello, &lt;world&gt;!"},
+		// The third test case sends a HEAD request to the HTTP server.
+		// The handler returned by the handlers.DefaultHandler function, which
+		// you'll explore shortly, does not handle the HEAD method.
+		// Therefore, it returns a 405 Method Not Allowed status code and an
+		// empty response body.
 		{http.MethodHead, nil, http.StatusMethodNotAllowed, ""},
 	}
 	client := new(http.Client)
 	path := fmt.Sprintf("http://%s/", srv.Addr)
+
+	// Pages 190-191
+	// Listing 9-3: Sending test requests to the HTTP server.
+	for i, c := range testCases {
+		// First, you create a new request, passing the parameters from the test case.
+		r, err := http.NewRequest(c.method, path, c.body)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+
+		// Next, you pass the request to the client's Do method, which returns
+		// the server's response.
+		resp, err := client.Do(r)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+
+		if resp.StatusCode != c.code {
+			t.Errorf("%d: unexpected status code: %q", i, resp.Status)
+		}
+
+		// You then check the status code and read in the entire response body.
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+		// You should be in the habit of consistently closing the response body
+		// if the client did not return an error, even if the response body is
+		// empty or you ignore it entirely.
+		// Failure to do so may prevent the client from reusing the underlying
+		// TCP connection.
+		_ = r.Body.Close()
+
+		if c.response != string(b) {
+			t.Errorf("%d: expected %q; actual %q", i, c.response, b)
+		}
+	}
+
+	// Once all tests complete, you call the server's Close method.
+	// This causes its Serve method in Listing 9-1 to return, stopping the
+	// server.
+	// The close method abruptly closes client connections.
+	if err := srv.Close(); err != nil {
+		t.Fatal(err)
+	}
 }
