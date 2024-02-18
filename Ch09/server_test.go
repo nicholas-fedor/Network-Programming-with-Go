@@ -29,7 +29,10 @@ func TestSimpleHTTPServer(t *testing.T) {
 		// In this example, you want the server to listen to port 8081 on IP
 		// address 127.0.0.1.
 		Handler: http.TimeoutHandler(
-			handlers.DefaultHandler(), 2*time.Minute, ""),
+			// Updated from handlers.DefaultHandler per Page 200's
+			// implementation of Listing 9-7's handlers.DefaultMethodsHandler,
+			// which provides additional functionality.
+			handlers.DefaultMethodsHandler(), 2*time.Minute, ""),
 		IdleTimeout:       5 * time.Minute,
 		ReadHeaderTimeout: time.Minute,
 	}
