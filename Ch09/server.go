@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/nicholas-fedor/Network-Programming-with-Go/Ch09/handlers"
+	"github.com/nicholas-fedor/Network-Programming-with-Go/Ch09/middleware"
 )
 
 var (
@@ -46,9 +47,11 @@ func main() {
 func run(addr, files, cert, pkey string) error {
 	mux := http.NewServeMux()
 	// The server's multiplexer has three routes: one for static files, ...
-	mux.Handle("/static",
-		http.StripPrefix(
-			".", http.FileServer(http.Dir(files)),
+	mux.Handle("/static/",
+		http.StripPrefix("/static/",
+			middleware.RestrictPrefix(
+				".", http.FileServer(http.Dir(files)),
+			),
 		),
 	)
 	// ... one for the default route, ...
