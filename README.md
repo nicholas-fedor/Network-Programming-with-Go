@@ -12,11 +12,11 @@ Code from the book.
 4. [Sending TCP data](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch04)
 5. [Unreliable UDP communication](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch05)
 6. [Ensuring UDP reliability](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch06)
-7. Unix domain sockets
-8. Writing HTTP clients
-9. Building HTTP services
-10. Caddy: A contemporary web server
-11. Securing communications with TLS
-12. Data serialization
-13. Logging and metrics
-14. Moving to the cloud
+7. [Unix domain sockets](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch07)
+8. [Writing HTTP clients](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch08)
+9. [Building HTTP services](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch09)
+10. [Caddy: A contemporary web server](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch10)
+11. [Securing communications with TLS](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch11)
+12. [Data serialization](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch12)
+13. [Logging and metrics](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch13)
+14. [Moving to the cloud](https://github.com/nicholas-fedor/Network-Programming-with-Go/tree/main/Ch14)
