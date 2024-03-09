@@ -1,0 +1,13 @@
+{
+  "listen": ["localhost:2030"],
+  "routes": [
+    {
+      "handle": [
+        {
+          "handler": "static_response",
+          "body": "Welcome to my temporary test server."
+        }
+      ]
+    }
+  ]
+}
