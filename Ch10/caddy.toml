@@ -1,26 +1,67 @@
+# Pages 235-236
+#
+# Listing 10-12: Caddy test server configuration
+# 
+# The TOML adapter directly converts TOML to JSON. Therefore, we need to make
+# sure we're using the same namespaces Caddy expects.
+# The namespace for the server is apps.http.servers.test_server
+# It listens for incoming connections on port 2020 of localhost.
 [apps.http.servers.test_server]
-listen = [
-    'localhost:2020',
-]
+listen = ['localhost:2020']
 
+# Listing 10-13: Adding a reverse proxy to the backend service
+#
+# The test_server configuration includes a routes array
 [[apps.http.servers.test_server.routes]]
+# Each route in the array has zero or more matchers.
+# A matcher is a special module that allows you to specify matching criteria for
+# incoming requests, like the http.ServeMux.Handle method's pattern matching
+# discussed in the previous chapter.
+# Caddy includes matcher modules that allow you to consider each part of a request.
 [[apps.http.servers.test_server.routes.match]]
+# For this route, you add a single matcher that matches any request for the
+# absolute path '/backend' or any path starting with '/backend/'. 
 path = [
     '/backend',
+    # The wildcard (*) character tells Caddy that you want to match on the
+    # '/backend/' prefix.
+    # For example, a request for the resource '/backend/this/is/a/test' will also match.
     '/backend/*',
 ]
+# The route may have one or more handlers.
+# Here, you tell Caddy you want to send all matching requests to the
+# reverse-proxy handler. 
 [[apps.http.servers.test_server.routes.handle]]
 handler = 'reverse_proxy'
+# The reverse-proxy handler needs to know where to send the requests.
+# You specify an upstream entry.
 [[apps.http.servers.test_server.routes.handle.upstreams]]
+# Its dial property is set to the backend server's socket address.
 dial = 'localhost:8080'
 
+# Listing 10-14: Adding a default route to serve static files.
+#
+# Unlike the route you added in Lising 10-13, this route does not include any
+# matchers. As such, Caddy would send every request to this route's handler if
+# the request didn't match any previous routes. In other words, this route is
+# your default route, and so its position in the file matters. If you moved this
+# route before the reverse-proxy route, all requests would match it, and no
+# requests would ever make their way to the reverse proxy. Whenever you specify
+# a route with no matches, make sure you put it at the end of your routes array,
+# as you do here.
 [[apps.http.servers.test_server.routes]]
+# As with the file server in the prceeding chapter, you want to protect against
+# accidentally serving sensitive files prefixed with a period. Therefore, you
+# include your restrict_prefix middleware in the array of handlers before the
+# file_server handler.
 [[apps.http.servers.test_server.routes.handle]]
 handler = 'restrict_prefix'
 prefix = '.'
+# You add more configuration options to serve files found in the files subdirectory.
 [[apps.http.servers.test_server.routes.handle]]
 handler = 'file_server'
 root = './files'
 index_names = [
+    # You return the index.html file if the request didn't specify a file.
     'index.html',
 ]
