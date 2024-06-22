@@ -100,7 +100,7 @@ func TestEchoServerTLS(t *testing.T) {
 	// Now that you've set up a trusted connection with a server, even though
 	// the server presented an unsigned certificate, let's make sure the server
 	// works as expected.
-	hello := []byte{"hello"}
+	hello := []byte("hello")
 	_, err = conn.Write(hello)
 	if err != nil {
 		t.Fatal(err)
