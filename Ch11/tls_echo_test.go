@@ -125,6 +125,6 @@ func TestEchoServerTLS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cancel
+	cancel()
 	<-done
 }
