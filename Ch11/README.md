@@ -32,3 +32,16 @@ This should output `cert.pem` and `key.pem` to the directory.
 
 The keys submitted to this repo are only for testing purposes and not to be used
 for production.
+
+## Listing 11-15: Generating a certificate and private-key pair for the server and the client
+
+Use the preceding code to generate certificate and key pairs for both the server
+and the client.
+
+```console
+go run cert/generate.go -cert serverCert.pem -key serverKey.pem -host localhost
+```
+
+```console
+go run cert/generate.go -cert clientCert.pem -key clientKey.pem -host localhost
+```
