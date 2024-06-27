@@ -25,7 +25,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -64,7 +64,9 @@ func TestEchoServerTLS(t *testing.T) {
 	// Listing 11-10: Pinning the server certificate to the client
 	// Pinning a server certificate to the client is straightforward.
 	// First, you read in the cert.pem file.
-	cert, err := ioutil.ReadFile("cert.pem")
+	// Note: Book references ioutil.ReadFile; however, is is deprecated.
+	// Using os.ReadFile instead.
+	cert, err := os.ReadFile("cert.pem")
 	if err != nil {
 		t.Fatal(err)
 	}
