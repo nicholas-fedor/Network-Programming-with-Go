@@ -3,6 +3,6 @@
 package housework
 
 type Chore struct {
-	Complete  bool
+	Complete    bool
 	Description string
 }

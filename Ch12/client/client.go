@@ -3,18 +3,19 @@
 package main
 
 import (
-	"Ch12/housework/v1"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"Ch12/housework/v1"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -25,14 +26,15 @@ var addr, caCertFn string
 func init() {
 	// Aside from all the new imports, you add flags for the gRPC server address
 	// and its certificate.
-	flag.StringVar(&addr, "address", "localhost:34443", "server address")
+	flag.StringVar(&addr, "address", "localhost:34443",
+		"server address")
 	flag.StringVar(&caCertFn, "ca-cert", "cert.pem", "CA certificate")
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
 			`Usage: %s [flags] [add chore, ...|complete #]
-	add					add comma-separated chores
-	complete			complete designated chore
+add         add comma-separated chores
+complete    complete designated chore
 
 Flags:
 `, filepath.Base(os.Args[0]))
@@ -62,7 +64,7 @@ func list(ctx context.Context, client housework.RobotMaidClient) error {
 		if chore.Complete {
 			c = "X"
 		}
-		fmt.Printf("%d\t[%s]\t%\n", i+1, c, chore.Description)
+		fmt.Printf("%d\t[%s]\t%s\n", i+1, c, chore.Description)
 	}
 
 	return nil
@@ -118,7 +120,7 @@ func complete(ctx context.Context, client housework.RobotMaidClient, s string) e
 func main() {
 	flag.Parse()
 
-	caCert, err := io.ReadAll(caCertFn)
+	caCert, err := ioutil.ReadFile(caCertFn)
 	if err != nil {
 		log.Fatal(err)
 	}
