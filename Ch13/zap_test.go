@@ -14,7 +14,7 @@ import (
 	"gopkg.in/fsnotify.v1"
 )
 
-// Paqes 302-303
+// Pages 302-303
 // Listing 13-6: The encoder configuration for your Zap logger.
 // The encoder configuration is independent of the encoder itself in that you
 // can use the same encoder configuration no matter whether you're passing it to

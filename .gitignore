@@ -22,3 +22,5 @@ go.work
 .vscode/settings.json
 Ch09/secret/localhost.crt
 Ch09/secret/localhost.key
+Ch14/xkcd
+Ch14/xkcd.zip
