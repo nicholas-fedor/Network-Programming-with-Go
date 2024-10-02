@@ -16,7 +16,7 @@ import (
 	"time"
 
 	// The only imports your code needs are the promhttp package for the metrics
-	// endpoint and your umetrics package to instrument your code.
+	// endpoint and your metrics package to instrument your code.
 	// The promhttp package includes an http.Handler that a Prometheus server
 	// can use to scrap metrics from your application.
 	// This handler serves not only your metrics but also metrics related to the
